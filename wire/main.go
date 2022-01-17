@@ -1,0 +1,5 @@
+package wire
+
+func main() {
+
+}

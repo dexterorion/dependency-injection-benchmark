@@ -1,0 +1,11 @@
+FROM gcr.io/google.com/cloudsdktool/cloud-sdk:alpine
+
+RUN apk --update add openjdk8-jre
+
+RUN gcloud components install cloud-datastore-emulator --quiet
+RUN gcloud components install beta --quiet
+RUN gcloud config set project trading-dev-201715
+
+EXPOSE 8888
+
+ENTRYPOINT ["gcloud", "beta", "emulators", "datastore", "start", "--host-port=0.0.0.0:8888", "--consistency=1.0"]

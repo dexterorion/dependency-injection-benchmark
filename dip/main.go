@@ -1,0 +1,5 @@
+package dip
+
+func main() {
+
+}
