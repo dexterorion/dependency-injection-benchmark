@@ -1,5 +1,0 @@
-package dip
-
-func main() {
-
-}

@@ -10,8 +10,8 @@ import (
 
 	providerPkg "github.com/dexterorion/dependency-injection-benchmark/dingo/provider"
 
-	datastore "cloud.google.com/go/datastore"
-	shared "github.com/dexterorion/dependency-injection-benchmark/shared"
+	services "github.com/dexterorion/dependency-injection-benchmark/shared/services"
+	storage "github.com/dexterorion/dependency-injection-benchmark/shared/storage"
 )
 
 // C retrieves a Container from an interface.
@@ -216,153 +216,29 @@ func (c *Container) IsClosed() bool {
 	return c.ctn.IsClosed()
 }
 
-// SafeGetDsclient retrieves the "dsclient" object from the main scope.
-//
-// ---------------------------------------------
-// 	name: "dsclient"
-// 	type: *datastore.Client
-// 	scope: "main"
-// 	build: func
-// 	params:
-// 		- "0": Value(context.Context)
-// 		- "1": Value(string)
-// 	unshared: false
-// 	close: false
-// ---------------------------------------------
-//
-// If the object can not be retrieved, it returns an error.
-func (c *Container) SafeGetDsclient() (*datastore.Client, error) {
-	i, err := c.ctn.SafeGet("dsclient")
-	if err != nil {
-		var eo *datastore.Client
-		return eo, err
-	}
-	o, ok := i.(*datastore.Client)
-	if !ok {
-		return o, errors.New("could get 'dsclient' because the object could not be cast to *datastore.Client")
-	}
-	return o, nil
-}
-
-// GetDsclient retrieves the "dsclient" object from the main scope.
-//
-// ---------------------------------------------
-// 	name: "dsclient"
-// 	type: *datastore.Client
-// 	scope: "main"
-// 	build: func
-// 	params:
-// 		- "0": Value(context.Context)
-// 		- "1": Value(string)
-// 	unshared: false
-// 	close: false
-// ---------------------------------------------
-//
-// If the object can not be retrieved, it panics.
-func (c *Container) GetDsclient() *datastore.Client {
-	o, err := c.SafeGetDsclient()
-	if err != nil {
-		panic(err)
-	}
-	return o
-}
-
-// UnscopedSafeGetDsclient retrieves the "dsclient" object from the main scope.
-//
-// ---------------------------------------------
-// 	name: "dsclient"
-// 	type: *datastore.Client
-// 	scope: "main"
-// 	build: func
-// 	params:
-// 		- "0": Value(context.Context)
-// 		- "1": Value(string)
-// 	unshared: false
-// 	close: false
-// ---------------------------------------------
-//
-// This method can be called even if main is a sub-scope of the container.
-// If the object can not be retrieved, it returns an error.
-func (c *Container) UnscopedSafeGetDsclient() (*datastore.Client, error) {
-	i, err := c.ctn.UnscopedSafeGet("dsclient")
-	if err != nil {
-		var eo *datastore.Client
-		return eo, err
-	}
-	o, ok := i.(*datastore.Client)
-	if !ok {
-		return o, errors.New("could get 'dsclient' because the object could not be cast to *datastore.Client")
-	}
-	return o, nil
-}
-
-// UnscopedGetDsclient retrieves the "dsclient" object from the main scope.
-//
-// ---------------------------------------------
-// 	name: "dsclient"
-// 	type: *datastore.Client
-// 	scope: "main"
-// 	build: func
-// 	params:
-// 		- "0": Value(context.Context)
-// 		- "1": Value(string)
-// 	unshared: false
-// 	close: false
-// ---------------------------------------------
-//
-// This method can be called even if main is a sub-scope of the container.
-// If the object can not be retrieved, it panics.
-func (c *Container) UnscopedGetDsclient() *datastore.Client {
-	o, err := c.UnscopedSafeGetDsclient()
-	if err != nil {
-		panic(err)
-	}
-	return o
-}
-
-// Dsclient retrieves the "dsclient" object from the main scope.
-//
-// ---------------------------------------------
-// 	name: "dsclient"
-// 	type: *datastore.Client
-// 	scope: "main"
-// 	build: func
-// 	params:
-// 		- "0": Value(context.Context)
-// 		- "1": Value(string)
-// 	unshared: false
-// 	close: false
-// ---------------------------------------------
-//
-// It tries to find the container with the C method and the given interface.
-// If the container can be retrieved, it calls the GetDsclient method.
-// If the container can not be retrieved, it panics.
-func Dsclient(i interface{}) *datastore.Client {
-	return C(i).GetDsclient()
-}
-
 // SafeGetFakeservice retrieves the "fakeservice" object from the main scope.
 //
 // ---------------------------------------------
 // 	name: "fakeservice"
-// 	type: shared.FakeService
+// 	type: services.FakeService
 // 	scope: "main"
 // 	build: func
-// 	params: nil
+// 	params:
+// 		- "0": Service(storage.FakeStorage) ["fakestorageinmem"]
 // 	unshared: false
 // 	close: false
 // ---------------------------------------------
 //
 // If the object can not be retrieved, it returns an error.
-func (c *Container) SafeGetFakeservice() (shared.FakeService, error) {
+func (c *Container) SafeGetFakeservice() (services.FakeService, error) {
 	i, err := c.ctn.SafeGet("fakeservice")
 	if err != nil {
-		var eo shared.FakeService
+		var eo services.FakeService
 		return eo, err
 	}
-	o, ok := i.(shared.FakeService)
+	o, ok := i.(services.FakeService)
 	if !ok {
-		return o, errors.New("could get 'fakeservice' because the object could not be cast to shared.FakeService")
+		return o, errors.New("could get 'fakeservice' because the object could not be cast to services.FakeService")
 	}
 	return o, nil
 }
@@ -371,16 +247,17 @@ func (c *Container) SafeGetFakeservice() (shared.FakeService, error) {
 //
 // ---------------------------------------------
 // 	name: "fakeservice"
-// 	type: shared.FakeService
+// 	type: services.FakeService
 // 	scope: "main"
 // 	build: func
-// 	params: nil
+// 	params:
+// 		- "0": Service(storage.FakeStorage) ["fakestorageinmem"]
 // 	unshared: false
 // 	close: false
 // ---------------------------------------------
 //
 // If the object can not be retrieved, it panics.
-func (c *Container) GetFakeservice() shared.FakeService {
+func (c *Container) GetFakeservice() services.FakeService {
 	o, err := c.SafeGetFakeservice()
 	if err != nil {
 		panic(err)
@@ -392,25 +269,26 @@ func (c *Container) GetFakeservice() shared.FakeService {
 //
 // ---------------------------------------------
 // 	name: "fakeservice"
-// 	type: shared.FakeService
+// 	type: services.FakeService
 // 	scope: "main"
 // 	build: func
-// 	params: nil
+// 	params:
+// 		- "0": Service(storage.FakeStorage) ["fakestorageinmem"]
 // 	unshared: false
 // 	close: false
 // ---------------------------------------------
 //
 // This method can be called even if main is a sub-scope of the container.
 // If the object can not be retrieved, it returns an error.
-func (c *Container) UnscopedSafeGetFakeservice() (shared.FakeService, error) {
+func (c *Container) UnscopedSafeGetFakeservice() (services.FakeService, error) {
 	i, err := c.ctn.UnscopedSafeGet("fakeservice")
 	if err != nil {
-		var eo shared.FakeService
+		var eo services.FakeService
 		return eo, err
 	}
-	o, ok := i.(shared.FakeService)
+	o, ok := i.(services.FakeService)
 	if !ok {
-		return o, errors.New("could get 'fakeservice' because the object could not be cast to shared.FakeService")
+		return o, errors.New("could get 'fakeservice' because the object could not be cast to services.FakeService")
 	}
 	return o, nil
 }
@@ -419,17 +297,18 @@ func (c *Container) UnscopedSafeGetFakeservice() (shared.FakeService, error) {
 //
 // ---------------------------------------------
 // 	name: "fakeservice"
-// 	type: shared.FakeService
+// 	type: services.FakeService
 // 	scope: "main"
 // 	build: func
-// 	params: nil
+// 	params:
+// 		- "0": Service(storage.FakeStorage) ["fakestorageinmem"]
 // 	unshared: false
 // 	close: false
 // ---------------------------------------------
 //
 // This method can be called even if main is a sub-scope of the container.
 // If the object can not be retrieved, it panics.
-func (c *Container) UnscopedGetFakeservice() shared.FakeService {
+func (c *Container) UnscopedGetFakeservice() services.FakeService {
 	o, err := c.UnscopedSafeGetFakeservice()
 	if err != nil {
 		panic(err)
@@ -441,7 +320,123 @@ func (c *Container) UnscopedGetFakeservice() shared.FakeService {
 //
 // ---------------------------------------------
 // 	name: "fakeservice"
-// 	type: shared.FakeService
+// 	type: services.FakeService
+// 	scope: "main"
+// 	build: func
+// 	params:
+// 		- "0": Service(storage.FakeStorage) ["fakestorageinmem"]
+// 	unshared: false
+// 	close: false
+// ---------------------------------------------
+//
+// It tries to find the container with the C method and the given interface.
+// If the container can be retrieved, it calls the GetFakeservice method.
+// If the container can not be retrieved, it panics.
+func Fakeservice(i interface{}) services.FakeService {
+	return C(i).GetFakeservice()
+}
+
+// SafeGetFakestorageinmem retrieves the "fakestorageinmem" object from the main scope.
+//
+// ---------------------------------------------
+// 	name: "fakestorageinmem"
+// 	type: storage.FakeStorage
+// 	scope: "main"
+// 	build: func
+// 	params: nil
+// 	unshared: false
+// 	close: false
+// ---------------------------------------------
+//
+// If the object can not be retrieved, it returns an error.
+func (c *Container) SafeGetFakestorageinmem() (storage.FakeStorage, error) {
+	i, err := c.ctn.SafeGet("fakestorageinmem")
+	if err != nil {
+		var eo storage.FakeStorage
+		return eo, err
+	}
+	o, ok := i.(storage.FakeStorage)
+	if !ok {
+		return o, errors.New("could get 'fakestorageinmem' because the object could not be cast to storage.FakeStorage")
+	}
+	return o, nil
+}
+
+// GetFakestorageinmem retrieves the "fakestorageinmem" object from the main scope.
+//
+// ---------------------------------------------
+// 	name: "fakestorageinmem"
+// 	type: storage.FakeStorage
+// 	scope: "main"
+// 	build: func
+// 	params: nil
+// 	unshared: false
+// 	close: false
+// ---------------------------------------------
+//
+// If the object can not be retrieved, it panics.
+func (c *Container) GetFakestorageinmem() storage.FakeStorage {
+	o, err := c.SafeGetFakestorageinmem()
+	if err != nil {
+		panic(err)
+	}
+	return o
+}
+
+// UnscopedSafeGetFakestorageinmem retrieves the "fakestorageinmem" object from the main scope.
+//
+// ---------------------------------------------
+// 	name: "fakestorageinmem"
+// 	type: storage.FakeStorage
+// 	scope: "main"
+// 	build: func
+// 	params: nil
+// 	unshared: false
+// 	close: false
+// ---------------------------------------------
+//
+// This method can be called even if main is a sub-scope of the container.
+// If the object can not be retrieved, it returns an error.
+func (c *Container) UnscopedSafeGetFakestorageinmem() (storage.FakeStorage, error) {
+	i, err := c.ctn.UnscopedSafeGet("fakestorageinmem")
+	if err != nil {
+		var eo storage.FakeStorage
+		return eo, err
+	}
+	o, ok := i.(storage.FakeStorage)
+	if !ok {
+		return o, errors.New("could get 'fakestorageinmem' because the object could not be cast to storage.FakeStorage")
+	}
+	return o, nil
+}
+
+// UnscopedGetFakestorageinmem retrieves the "fakestorageinmem" object from the main scope.
+//
+// ---------------------------------------------
+// 	name: "fakestorageinmem"
+// 	type: storage.FakeStorage
+// 	scope: "main"
+// 	build: func
+// 	params: nil
+// 	unshared: false
+// 	close: false
+// ---------------------------------------------
+//
+// This method can be called even if main is a sub-scope of the container.
+// If the object can not be retrieved, it panics.
+func (c *Container) UnscopedGetFakestorageinmem() storage.FakeStorage {
+	o, err := c.UnscopedSafeGetFakestorageinmem()
+	if err != nil {
+		panic(err)
+	}
+	return o
+}
+
+// Fakestorageinmem retrieves the "fakestorageinmem" object from the main scope.
+//
+// ---------------------------------------------
+// 	name: "fakestorageinmem"
+// 	type: storage.FakeStorage
 // 	scope: "main"
 // 	build: func
 // 	params: nil
@@ -450,8 +445,8 @@ func (c *Container) UnscopedGetFakeservice() shared.FakeService {
 // ---------------------------------------------
 //
 // It tries to find the container with the C method and the given interface.
-// If the container can be retrieved, it calls the GetFakeservice method.
+// If the container can be retrieved, it calls the GetFakestorageinmem method.
 // If the container can not be retrieved, it panics.
-func Fakeservice(i interface{}) shared.FakeService {
-	return C(i).GetFakeservice()
+func Fakestorageinmem(i interface{}) storage.FakeStorage {
+	return C(i).GetFakestorageinmem()
 }

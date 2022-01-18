@@ -7,4 +7,6 @@ require (
 	github.com/sarulabs/di/v2 v2.4.2 // indirect
 	github.com/sarulabs/dingo v2.0.0+incompatible // indirect
 	github.com/sarulabs/dingo/v4 v4.2.0 // indirect
+	go.uber.org/dig v1.13.0 // indirect
+	go.uber.org/fx v1.16.0 // indirect
 )
